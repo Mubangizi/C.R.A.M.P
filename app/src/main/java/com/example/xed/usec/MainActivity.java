@@ -9,34 +9,37 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class MainActivity extends AppCompatActivity {
 
-    private RecyclerView mpostRecylerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mpostRecylerView = (RecyclerView) findViewById(R.id.post_list);
-        mpostRecylerView.setHasFixedSize(true);
-        mpostRecylerView.setLayoutManager(new LinearLayoutManager(this));
+        //for sending to login imediately
+        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(loginIntent);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-    }
+        //checking if logged in
+        FirebaseUser currentuser = FirebaseAuth.getInstance().getCurrentUser();
 
+        if(currentuser==null){
 
-
-    public static class PostViewHolder extends RecyclerView.ViewHolder{
-        View mview;
-        public PostViewHolder(View itemView) {
-            super(itemView);
-            itemView =mview;
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();   //methi
         }
     }
+
+
 
 
 
