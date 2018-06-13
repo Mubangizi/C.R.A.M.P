@@ -43,7 +43,7 @@ public class PostActivity extends AppCompatActivity {
 
 
 
-    static final int GALLERY_REQUEST =1;
+    static final int GALLERY_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,4 +146,6 @@ public class PostActivity extends AppCompatActivity {
     public void toastMessage(String message){
         Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
     }
+
 }
+
