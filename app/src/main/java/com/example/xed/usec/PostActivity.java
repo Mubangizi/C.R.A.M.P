@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -91,7 +92,7 @@ public class PostActivity extends AppCompatActivity {
         if(!TextUtils.isEmpty(title_val ) && !TextUtils.isEmpty(desc_val) && mimageUri != null){
 
             //path where posts are to be stored on the server
-            StorageReference filePath = mstorage.child("Crime_images").child(UUID.randomUUID().toString());
+            final StorageReference filePath = mstorage.child("Crime_images").child(UUID.randomUUID().toString());
 
             //uploading files
            filePath.putFile(mimageUri)
@@ -99,27 +100,31 @@ public class PostActivity extends AppCompatActivity {
                        @Override
                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
+                           Task<Uri> downloadurl = filePath.getDownloadUrl();
+
                            DatabaseReference newpost = mdatabase.push();     //push for creating random ids for the posts
                            newpost.child("title").setValue(title_val);
                            newpost.child("Description").setValue(desc_val);
-                           newpost.child("image").setValue( mimageUri.toString());
+                           newpost.child("image").setValue( downloadurl.toString());
 
                            mprogress.dismiss();
-                           toastMessage("Uploaded");
+
+                           startActivity(new Intent(PostActivity.this, MainActivity.class));
+                           toastMessage("Posted");
                        }
                    })
                    .addOnFailureListener(new OnFailureListener() {
                        @Override
                        public void onFailure(@NonNull Exception e) {
                            mprogress.dismiss();
-                           toastMessage("Failed to upload");
+                           toastMessage("Failed to post");
                        }
                    })
                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                        @Override
                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
                            double progress =(100.0*taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
-                           mprogress.setMessage("Uploaded "+(int)progress+"%");
+                           mprogress.setMessage("Posting "+(int)progress+"%");
                        }
                    });
         }
