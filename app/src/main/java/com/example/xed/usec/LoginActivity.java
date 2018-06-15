@@ -53,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
-                                sentToMain();
+                                sendToMain();
                             }else {
                                 String errormessage = task.getException().getMessage();
                                 toastmessage(errormessage);
@@ -68,11 +68,23 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if(currentUser != null){
+            sendToMain();
+        }
+
+    }
+
 
 
 
     //sending to main
-    public void sentToMain(){
+    public void sendToMain(){
         Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(mainIntent);
         finish();
