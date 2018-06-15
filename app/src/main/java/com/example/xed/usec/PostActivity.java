@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -37,6 +38,7 @@ public class PostActivity extends AppCompatActivity {
     private Button msubmitButton;
     private Uri mimageUri=null;
     private ProgressDialog mprogress;
+    private Toolbar mposttoolbar;
 
     private DatabaseReference mdatabase;   //root directory
     private StorageReference mstorage;
@@ -50,14 +52,19 @@ public class PostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
 
+        mstorage = FirebaseStorage.getInstance().getReference();    //this gets the root storage on our database on the server
+        mdatabase = FirebaseDatabase.getInstance().getReference().child("Crime");
+
         mimageBUtton = (ImageButton) findViewById(R.id.imageSelect);
         mtitleEditText = (EditText) findViewById(R.id.titleSelect);
         mdescEditText = (EditText) findViewById(R.id.descSelect);
         msubmitButton = (Button) findViewById(R.id.submitBtn);
         mprogress =new ProgressDialog(this);
 
-        mstorage = FirebaseStorage.getInstance().getReference();    //this gets the root storage on our database on the server
-        mdatabase = FirebaseDatabase.getInstance().getReference().child("Crime");
+        mposttoolbar = findViewById(R.id.posttoolbar);
+        setSupportActionBar(mposttoolbar);
+        getSupportActionBar().setTitle("Add New Post");
+
 
 
         mimageBUtton.setOnClickListener(new View.OnClickListener() {

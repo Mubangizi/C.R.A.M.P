@@ -42,6 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
         mregEmail =(EditText) findViewById(R.id.regemail);
         mregPassword = (EditText) findViewById(R.id.regpassword);
         mregConfirmPass = (EditText) findViewById(R.id.regconfirmpassword);
+        mregprogress = findViewById(R.id.regprogress);
 
 
         mregBtn.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +64,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                                 if (task.isSuccessful()){
                                     sendtomain();
+                                    toastmessage("Account Successfully created");
                                 }else {
                                     String errormessage = task.getException().getMessage();
                                     toastmessage(errormessage);
@@ -72,7 +74,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                         mregprogress.setVisibility(View.INVISIBLE);
                     }else {
-                        toastmessage("Passwordfields dont match");
+                        toastmessage("Password fields dont match");
                     }
                 }
             }

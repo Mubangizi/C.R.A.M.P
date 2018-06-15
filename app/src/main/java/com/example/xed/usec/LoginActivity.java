@@ -36,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         mpasswordText= (EditText) findViewById(R.id.regconfirmpassword);
         mloginBtn = (Button) findViewById(R.id.loginbtn);
         mregbtn = (Button) findViewById(R.id.loginregbtn);
-        mloginProgress = (ProgressBar) findViewById(R.id.loginprogress);
+        mloginProgress = findViewById(R.id.loginprogress);
 
         mloginBtn.setOnClickListener(new View.OnClickListener() {
             @Override

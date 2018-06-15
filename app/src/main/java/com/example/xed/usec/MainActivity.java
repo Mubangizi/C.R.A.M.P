@@ -1,6 +1,12 @@
 package com.example.xed.usec;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.design.internal.BottomNavigationMenu;
+import android.support.design.internal.BottomNavigationMenuView;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Switch;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -17,6 +24,10 @@ public class MainActivity extends AppCompatActivity {
 
     private Toolbar mmainToolBar;
     private FirebaseAuth mAuth;
+
+    private BottomNavigationView mainBottonNav;
+    private HomeFragment homeFragment;
+    private NotificationFragment notificationFragment;
 
 
 
@@ -30,8 +41,36 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mmainToolBar);
         getSupportActionBar().setTitle("Crime reports");
 
-
         mAuth=FirebaseAuth.getInstance();
+        mainBottonNav = (BottomNavigationView) findViewById(R.id.bottomNavigationmenu) ;
+
+        //FRAGMENTS
+        homeFragment =new HomeFragment();
+        notificationFragment = new NotificationFragment();
+
+
+        mainBottonNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                switch(item.getItemId()){
+                    case R.id.bottomActionHome:
+                        replaceFragment(homeFragment);
+                        return true;
+
+                    case R.id.bottomActionNotification:
+                        replaceFragment(notificationFragment);
+
+                        return true;
+
+                    default:
+                        return  false;
+
+
+                }
+
+            }
+        });
     }
 
     @Override
@@ -39,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         //checking if logged in
         FirebaseUser currentuser = FirebaseAuth.getInstance().getCurrentUser();
-
         if(currentuser==null){
 
             sendtoLogin();
@@ -89,5 +127,11 @@ public class MainActivity extends AppCompatActivity {
     private void logout() {
         mAuth.signOut();
         sendtoLogin();
+    }
+
+    private void replaceFragment(android.support.v4.app.Fragment fragment){
+        android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.maincontainer, fragment);
+        fragmentTransaction.commit();
     }
 }
