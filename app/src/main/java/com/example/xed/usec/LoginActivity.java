@@ -11,7 +11,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -33,8 +32,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
-        memailText = (EditText) findViewById(R.id.loginemail);
-        mpasswordText= (EditText) findViewById(R.id.loginpassword);
+        memailText = (EditText) findViewById(R.id.regemail);
+        mpasswordText= (EditText) findViewById(R.id.regconfirmpassword);
         mloginBtn = (Button) findViewById(R.id.loginbtn);
         mregbtn = (Button) findViewById(R.id.loginregbtn);
         mloginProgress = (ProgressBar) findViewById(R.id.loginprogress);
@@ -66,6 +65,14 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
+
+        mregbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent regintent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(regintent);
+            }
+        });
     }
 
     @Override
@@ -79,8 +86,6 @@ public class LoginActivity extends AppCompatActivity {
         }
 
     }
-
-
 
 
     //sending to main
