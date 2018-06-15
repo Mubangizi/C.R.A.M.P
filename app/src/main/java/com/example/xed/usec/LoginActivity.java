@@ -69,17 +69,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onStart() {
-        super.onStart();
 
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-
-        if(currentUser != null){
-            sentToMain();
-        }
-
-    }
 
     //sending to main
     public void sentToMain(){
