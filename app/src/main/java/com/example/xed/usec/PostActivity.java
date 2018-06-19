@@ -14,15 +14,20 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.util.HashMap;
@@ -32,6 +37,7 @@ import java.util.UUID;
 public class PostActivity extends AppCompatActivity {
 
 
+    /*
     private ImageButton mimageBUtton;
     private EditText mtitleEditText;
     private EditText mdescEditText;
@@ -44,7 +50,6 @@ public class PostActivity extends AppCompatActivity {
     private StorageReference mstorage;
 
 
-
     static final int GALLERY_REQUEST = 1;
 
     @Override
@@ -53,7 +58,7 @@ public class PostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_post);
 
         mstorage = FirebaseStorage.getInstance().getReference();    //this gets the root storage on our database on the server
-        mdatabase = FirebaseDatabase.getInstance().getReference().child("Crime");
+        //mdatabase = FirebaseDatabase.getInstance().getReference().child("posts");
 
         mimageBUtton = (ImageButton) findViewById(R.id.imageSelect);
         mtitleEditText = (EditText) findViewById(R.id.titleSelect);
@@ -70,7 +75,6 @@ public class PostActivity extends AppCompatActivity {
         mimageBUtton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 galleryIntent.setType("image/*");
                 startActivityForResult(galleryIntent, GALLERY_REQUEST);
@@ -83,7 +87,6 @@ public class PostActivity extends AppCompatActivity {
             public void onClick(View v) {
                 startPosting();
             }
-
         });
 
     }
@@ -99,20 +102,21 @@ public class PostActivity extends AppCompatActivity {
         if(!TextUtils.isEmpty(title_val ) && !TextUtils.isEmpty(desc_val) && mimageUri != null){
 
             //path where posts are to be stored on the server
-            final StorageReference filePath = mstorage.child("Crime_images").child(UUID.randomUUID().toString());
+            final StorageReference filePath = mstorage.child("Post_images").child(UUID.randomUUID().toString());
 
             //uploading files
            filePath.putFile(mimageUri)
-                   .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                   .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                        @Override
-                       public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                       public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
 
                            Task<Uri> downloadurl = filePath.getDownloadUrl();
 
                            DatabaseReference newpost = mdatabase.push();     //push for creating random ids for the posts
                            newpost.child("title").setValue(title_val);
-                           newpost.child("Description").setValue(desc_val);
+                           newpost.child("description").setValue(desc_val);
                            newpost.child("image").setValue( downloadurl.toString());
+                           //newpost.child("timestamp").setValue(FieldValue.serverTimestamp());
 
                            mprogress.dismiss();
 
@@ -120,6 +124,7 @@ public class PostActivity extends AppCompatActivity {
                            toastMessage("Posted");
                        }
                    })
+
                    .addOnFailureListener(new OnFailureListener() {
                        @Override
                        public void onFailure(@NonNull Exception e) {
@@ -134,6 +139,7 @@ public class PostActivity extends AppCompatActivity {
                            mprogress.setMessage("Posting "+(int)progress+"%");
                        }
                    });
+
         }
     }
 
@@ -142,17 +148,31 @@ public class PostActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode==GALLERY_REQUEST && resultCode==RESULT_OK){
+        if(requestCode==GALLERY_REQUEST && resultCode==RESULT_OK) {
 
-            mimageUri = data.getData();
-            mimageBUtton.setImageURI(mimageUri);
+            Uri imageUri = data.getData();
 
+            CropImage.activity(imageUri)
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .start(this);
         }
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                mimageUri = result.getUri();
+                mimageBUtton.setImageURI(mimageUri);
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
+
     }
 
     public void toastMessage(String message){
         Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
     }
+    */
 
 }
 

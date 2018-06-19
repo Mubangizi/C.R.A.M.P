@@ -37,40 +37,45 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Setting up the toolbar
-        mmainToolBar = (Toolbar) findViewById(R.id.main_toolbar);
+        mmainToolBar = findViewById(R.id.main_toolbar);
         setSupportActionBar(mmainToolBar);
-        getSupportActionBar().setTitle("Crime reports");
+        getSupportActionBar().setTitle("Add New Post");
 
         mAuth=FirebaseAuth.getInstance();
         mainBottonNav = (BottomNavigationView) findViewById(R.id.bottomNavigationmenu) ;
 
-        //FRAGMENTS
-        homeFragment =new HomeFragment();
-        notificationFragment = new NotificationFragment();
+        if(mAuth.getCurrentUser()!= null) {
+            //FRAGMENTS
+            homeFragment = new HomeFragment();
+            notificationFragment = new NotificationFragment();
+
+            //MAKING SURE HOME FRAGMENT IS LOADED FIRST
+            replaceFragment(homeFragment);
 
 
-        mainBottonNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            mainBottonNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-                switch(item.getItemId()){
-                    case R.id.bottomActionHome:
-                        replaceFragment(homeFragment);
-                        return true;
+                    switch (item.getItemId()) {
+                        case R.id.bottomActionHome:
+                            replaceFragment(homeFragment);
+                            return true;
 
-                    case R.id.bottomActionNotification:
-                        replaceFragment(notificationFragment);
+                        case R.id.bottomActionNotification:
+                            replaceFragment(notificationFragment);
 
-                        return true;
+                            return true;
 
-                    default:
-                        return  false;
+                        default:
+                            return false;
 
+
+                    }
 
                 }
-
-            }
-        });
+            });
+        }
     }
 
     @Override
@@ -112,6 +117,10 @@ public class MainActivity extends AppCompatActivity {
                 logout();
                 return true;
 
+            case R.id.actionAccountSettingsbtn:
+                Intent accountsetupIntent = new Intent(MainActivity.this, AccoutSetupActivity.class);
+                startActivity(accountsetupIntent);
+                return true;
             default:
                     return false;   //previous return; return super.onOptionsItemSelected(item);
         }

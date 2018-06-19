@@ -36,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         mpasswordText= (EditText) findViewById(R.id.regconfirmpassword);
         mloginBtn = (Button) findViewById(R.id.loginbtn);
         mregbtn = (Button) findViewById(R.id.loginregbtn);
-        mloginProgress = findViewById(R.id.loginprogress);
+        mloginProgress = findViewById(R.id.login_progressBar);
 
         mloginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,7 +52,9 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
-                                sendToMain();
+                                //sendToMain();
+                                Intent setupIntent =new Intent(LoginActivity.this, AccoutSetupActivity.class);
+                                startActivity(setupIntent);
                             }else {
                                 String errormessage = task.getException().getMessage();
                                 toastmessage(errormessage);
