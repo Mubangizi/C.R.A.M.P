@@ -58,12 +58,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if(item.getItemId()==R.id.actionAdd ){
-
-            Intent postintent = new Intent(MainActivity.this,PostActivity.class);
-            startActivity(postintent);
-        }
-
         switch (item.getItemId()) {
             case R.id.actionAdd:
                 Intent postintent = new Intent(MainActivity.this,PostActivity.class);
@@ -72,6 +66,10 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.actionlogoutbtn:
                 logout();
+                return true;
+            case R.id.actionAccountSettingsbtn:
+                Intent accsetupintent = new Intent(MainActivity.this,AccountSetupActivity.class);
+                startActivity(accsetupintent);
                 return true;
 
             default:

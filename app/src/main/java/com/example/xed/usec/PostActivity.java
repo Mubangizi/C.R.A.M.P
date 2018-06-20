@@ -22,6 +22,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.util.HashMap;
@@ -57,16 +59,16 @@ public class PostActivity extends AppCompatActivity {
         mprogress =new ProgressDialog(this);
 
         mstorage = FirebaseStorage.getInstance().getReference();    //this gets the root storage on our database on the server
-        mdatabase = FirebaseDatabase.getInstance().getReference().child("Crime");
+        mdatabase = FirebaseDatabase.getInstance().getReference().child("Posts");
 
 
         mimageBUtton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent, GALLERY_REQUEST);
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .start(PostActivity.this);
             }
         });
 
@@ -92,7 +94,7 @@ public class PostActivity extends AppCompatActivity {
         if(!TextUtils.isEmpty(title_val ) && !TextUtils.isEmpty(desc_val) && mimageUri != null){
 
             //path where posts are to be stored on the server
-            final StorageReference filePath = mstorage.child("Crime_images").child(UUID.randomUUID().toString());
+            final StorageReference filePath = mstorage.child("post_images").child(UUID.randomUUID().toString());
 
             //uploading files
            filePath.putFile(mimageUri)
@@ -135,11 +137,14 @@ public class PostActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode==GALLERY_REQUEST && resultCode==RESULT_OK){
-
-            mimageUri = data.getData();
-            mimageBUtton.setImageURI(mimageUri);
-
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                mimageUri = result.getUri();
+                mimageBUtton.setImageURI(mimageUri);
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
         }
     }
 

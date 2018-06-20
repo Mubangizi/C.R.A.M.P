@@ -53,7 +53,9 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
-                                sendToMain();
+                                Intent setupIntent = new Intent(LoginActivity.this, AccountSetupActivity.class);
+                                startActivity(setupIntent);
+                                finish();
                             }else {
                                 String errormessage = task.getException().getMessage();
                                 toastmessage(errormessage);
@@ -75,19 +77,11 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         if(currentUser != null){
-            sendToMain();
+            Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(mainIntent);
+            finish();
         }
 
-    }
-
-
-
-
-    //sending to main
-    public void sendToMain(){
-        Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(mainIntent);
-        finish();
     }
 
     //toastin message
