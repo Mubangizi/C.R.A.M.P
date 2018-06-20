@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,8 +21,11 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -35,13 +39,13 @@ public class AccountSetupActivity extends AppCompatActivity {
     private Toolbar setupToolbar;
     private CircleImageView msetupImage;
     private Uri setupimageUrl = null;
-    private final int GALLERY_REQUEST = 1;
     private Button msetupbtn;
     private EditText msetupuserName;
     private ProgressBar msetupprogress;
     private StorageReference storageReference;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference mdatabase;
+    private  String user_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,11 +59,16 @@ public class AccountSetupActivity extends AppCompatActivity {
         msetupprogress = findViewById(R.id.setup_progressBar);
         storageReference = FirebaseStorage.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
+
+        user_id = firebaseAuth.getCurrentUser().getUid();
+
         mdatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
         setupToolbar = findViewById(R.id.setuptoolbar);
         setSupportActionBar(setupToolbar);
         getSupportActionBar().setTitle("Account Setup");
+
+
         msetupImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,6 +87,8 @@ public class AccountSetupActivity extends AppCompatActivity {
                 }
             }
         });
+
+
         msetupbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,8 +96,9 @@ public class AccountSetupActivity extends AppCompatActivity {
                 msetupprogress.setVisibility(View.VISIBLE);
 
                 if (!TextUtils.isEmpty(username_val) && setupimageUrl != null) {
-                    final String user_id = FirebaseAuth.getInstance().getUid();
-                    final StorageReference imagepath = storageReference.child("Profile_Images").child(user_id + ".jpg");
+
+                    user_id = FirebaseAuth.getInstance().getUid();
+                    final StorageReference imagepath = storageReference.child("Profile_Images").child(user_id+ ".jpg");
                     imagepath.putFile(setupimageUrl).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -94,7 +106,7 @@ public class AccountSetupActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
 
                                 Task<Uri> downloadurl = imagepath.getDownloadUrl();
-                                DatabaseReference userref = mdatabase.push();
+                                DatabaseReference userref = mdatabase.child(user_id);
                                 userref.child("username").setValue(username_val);
                                 userref.child("profileimages").setValue(downloadurl.toString());
 
@@ -131,6 +143,8 @@ public class AccountSetupActivity extends AppCompatActivity {
             }
         }
     }
+
+
 
     public void imagepicker() {
 
