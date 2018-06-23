@@ -46,6 +46,7 @@ public class AccountSetupActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private DatabaseReference mdatabase;
     private  String user_id;
+    private String username_val;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,7 @@ public class AccountSetupActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
         user_id = firebaseAuth.getCurrentUser().getUid();
+        username_val = msetupuserName.getText().toString();
 
         mdatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
@@ -92,7 +94,6 @@ public class AccountSetupActivity extends AppCompatActivity {
         msetupbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String username_val = msetupuserName.getText().toString();
                 msetupprogress.setVisibility(View.VISIBLE);
 
                 if (!TextUtils.isEmpty(username_val) && setupimageUrl != null) {
@@ -106,9 +107,17 @@ public class AccountSetupActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
 
                                 Task<Uri> downloadurl = imagepath.getDownloadUrl();
+                                //Uri downloadurl = imagepath.getDownloadUrl().getResult();
+
+                                Post post = new Post(username_val,downloadurl.toString());
+                                mdatabase.child(user_id).setValue(post);
+
+
+                                /*
                                 DatabaseReference userref = mdatabase.child(user_id);
                                 userref.child("username").setValue(username_val);
                                 userref.child("profileimages").setValue(downloadurl.toString());
+                                */
 
                                 Toast.makeText(AccountSetupActivity.this, "Settings Updated", Toast.LENGTH_LONG).show();
                                 Intent homepageIntent = new Intent(AccountSetupActivity.this, MainActivity.class);
@@ -152,7 +161,6 @@ public class AccountSetupActivity extends AppCompatActivity {
                 .setGuidelines(CropImageView.Guidelines.ON)
                 .setAspectRatio(1,1)
                 .start(AccountSetupActivity.this);
-
     }
 
 }

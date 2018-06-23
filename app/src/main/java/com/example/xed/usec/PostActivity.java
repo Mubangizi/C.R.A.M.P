@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -42,6 +43,8 @@ public class PostActivity extends AppCompatActivity {
 
     private DatabaseReference mdatabase;   //root directory
     private StorageReference mstorage;
+    private FirebaseAuth firebaseAuth;
+    private String userid;
 
 
 
@@ -58,8 +61,10 @@ public class PostActivity extends AppCompatActivity {
         msubmitButton = (Button) findViewById(R.id.submitBtn);
         mprogress =new ProgressDialog(this);
 
+        firebaseAuth = FirebaseAuth.getInstance();
+        userid = firebaseAuth.getCurrentUser().getUid();
         mstorage = FirebaseStorage.getInstance().getReference();    //this gets the root storage on our database on the server
-        mdatabase = FirebaseDatabase.getInstance().getReference().child("Posts");
+        mdatabase = FirebaseDatabase.getInstance().getReference("Posts");
 
 
         mimageBUtton.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +94,7 @@ public class PostActivity extends AppCompatActivity {
         mprogress.show();
         final String title_val = mtitleEditText.getText().toString().trim();
         final String desc_val = mdescEditText.getText().toString().trim();
+        final String entry_id = String.valueOf(System.currentTimeMillis());
 
         //checking if title, desc and image are not empty
         if(!TextUtils.isEmpty(title_val ) && !TextUtils.isEmpty(desc_val) && mimageUri != null){
@@ -104,10 +110,18 @@ public class PostActivity extends AppCompatActivity {
 
                            Task<Uri> downloadurl = filePath.getDownloadUrl();
 
+
+
+                           Post post = new Post(entry_id,title_val,desc_val,downloadurl.toString());
+                           mdatabase.child(post.getEntry_id()).setValue(post);
+
+                           /*//post.setDesc(desc_val);
+
                            DatabaseReference newpost = mdatabase.push();     //push for creating random ids for the posts
                            newpost.child("title").setValue(title_val);
-                           newpost.child("Description").setValue(desc_val);
+                           newpost.child("description").setValue(desc_val);
                            newpost.child("image").setValue( downloadurl.toString());
+                           newpost.child("user_id").setValue(userid);*/
 
                            mprogress.dismiss();
 

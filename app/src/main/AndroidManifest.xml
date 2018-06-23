@@ -21,9 +21,12 @@
         </activity>
         <activity android:name=".PostActivity" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".AccountSetupActivity"></activity>
-        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat"/>
+        <activity android:name=".AccountSetupActivity" />
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
+        <activity android:name=".PostListLayout" />
+        <activity android:name=".AccountRegistration"></activity>
     </application>
 
 </manifest>

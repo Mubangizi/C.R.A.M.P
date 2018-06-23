@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentuser = FirebaseAuth.getInstance().getCurrentUser();
 
         if(currentuser==null){
-
             sendtoLogin();
         }
     }
