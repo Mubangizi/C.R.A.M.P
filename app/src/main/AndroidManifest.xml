@@ -26,7 +26,8 @@
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
         <activity android:name=".PostListLayout" />
-        <activity android:name=".AccountRegistration"></activity>
+        <activity android:name=".AccountRegistration" />
+        <activity android:name=".SinglePostActivity"></activity>
     </application>
 
 </manifest>

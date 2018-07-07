@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -71,9 +72,9 @@ public class PostActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .start(PostActivity.this);
+            CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .start(PostActivity.this);
             }
         });
 
@@ -95,6 +96,7 @@ public class PostActivity extends AppCompatActivity {
         final String title_val = mtitleEditText.getText().toString().trim();
         final String desc_val = mdescEditText.getText().toString().trim();
         final String entry_id = String.valueOf(System.currentTimeMillis());
+        final String user_id =String.valueOf(userid);
 
         //checking if title, desc and image are not empty
         if(!TextUtils.isEmpty(title_val ) && !TextUtils.isEmpty(desc_val) && mimageUri != null){
@@ -104,45 +106,48 @@ public class PostActivity extends AppCompatActivity {
 
             //uploading files
            filePath.putFile(mimageUri)
-                   .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                       @Override
-                       public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+               .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                   @Override
+                   public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                           Task<Uri> downloadurl = filePath.getDownloadUrl();
+                       taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                           @Override
+                           public void onComplete(@NonNull Task<Uri> task) {
+                               String downloaduri = String.valueOf(task.getResult());
 
+                               Post post = new Post(entry_id,title_val,desc_val,downloaduri,user_id);
+                               mdatabase.child(post.getEntry_id()).setValue(post);
 
+                               mprogress.dismiss();
 
-                           Post post = new Post(entry_id,title_val,desc_val,downloadurl.toString());
-                           mdatabase.child(post.getEntry_id()).setValue(post);
+                               startActivity(new Intent(PostActivity.this, MainActivity.class));
+                               toastMessage("Posted");
 
-                           /*//post.setDesc(desc_val);
+                           }
+                       }).addOnFailureListener(new OnFailureListener() {
+                           @Override
+                           public void onFailure(@NonNull Exception e) {
 
-                           DatabaseReference newpost = mdatabase.push();     //push for creating random ids for the posts
-                           newpost.child("title").setValue(title_val);
-                           newpost.child("description").setValue(desc_val);
-                           newpost.child("image").setValue( downloadurl.toString());
-                           newpost.child("user_id").setValue(userid);*/
-
-                           mprogress.dismiss();
-
-                           startActivity(new Intent(PostActivity.this, MainActivity.class));
-                           toastMessage("Posted");
-                       }
-                   })
-                   .addOnFailureListener(new OnFailureListener() {
-                       @Override
-                       public void onFailure(@NonNull Exception e) {
-                           mprogress.dismiss();
-                           toastMessage("Failed to post");
-                       }
-                   })
-                   .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                       @Override
-                       public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                           double progress =(100.0*taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
-                           mprogress.setMessage("Posting "+(int)progress+"%");
-                       }
-                   });
+                           }
+                       });
+                   }
+               })
+               .addOnFailureListener(new OnFailureListener() {
+                   @Override
+                   public void onFailure(@NonNull Exception e) {
+                       mprogress.dismiss();
+                       toastMessage("Failed to post");
+                   }
+               })
+               .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                   @Override
+                   public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                       double progress =(100.0*taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
+                       mprogress.setMessage("Posting "+(int)progress+"%");
+                   }
+               });
+        }else {
+            Toast.makeText(PostActivity.this, "Missing fields: ", Toast.LENGTH_LONG).show();
         }
     }
 

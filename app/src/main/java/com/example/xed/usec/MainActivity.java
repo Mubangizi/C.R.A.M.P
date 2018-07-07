@@ -6,6 +6,7 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar mmainToolBar;
     private FirebaseAuth mAuth;
     private BottomNavigationView mainbottomnav;
+    private FloatingActionButton maddfloat;
 
     //fragments
     private HomeFragment homeFragment;
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mAuth=FirebaseAuth.getInstance();
+        maddfloat = (FloatingActionButton) findViewById(R.id.addfloatingBtn);
 
         //Setting up the toolbar
         mmainToolBar = (Toolbar) findViewById(R.id.main_toolbar);
@@ -78,6 +81,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        maddfloat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent postintent = new Intent(MainActivity.this,PostActivity.class);
+                startActivity(postintent);
+            }
+        });
+
     }
 
     @Override
@@ -104,11 +116,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.actionAdd:
-                Intent postintent = new Intent(MainActivity.this,PostActivity.class);
-                startActivity(postintent);
-                return true;
-
             case R.id.actionlogoutbtn:
                 logout();
                 return true;

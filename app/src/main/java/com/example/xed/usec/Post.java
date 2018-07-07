@@ -6,28 +6,32 @@ public class Post {
     private String description;
     private String image;
     private String entry_id;
+    String user_id;
+    private String profileImage;
     private String username;
-    private String profileimage;
+
+    public Post(String username, String profileImage) {
+        this.profileImage = profileImage;
+        this.username = username;
+    }
 
     public Post(){
     }
 
-    public Post(String title, String description, String image) {
-        this.title = title;
-        this.description = description;
-        this.image = image;
-    }
-
-    public Post(String entry_id, String title, String description, String image) {
+    public Post(String entry_id, String title, String description, String image, String user_id) {
         this.title = title;
         this.description = description;
         this.image = image;
         this.entry_id = entry_id;
+        this.user_id = user_id;
     }
 
-    public Post(String username, String profileimage) {
-        this.username = username;
-        this.profileimage =profileimage;
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
     public String getEntry_id() {
@@ -36,22 +40,6 @@ public class Post {
 
     public void setEntry_id(String entry_id) {
         this.entry_id = entry_id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getProfileimage() {
-        return profileimage;
-    }
-
-    public void setProfileimage(String profileimage) {
-        this.profileimage = profileimage;
     }
 
     public String getImage() {
@@ -77,4 +65,22 @@ public class Post {
     public void setTitle(String title) {
         this.title = title;
     }
+
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+        }
 }
+

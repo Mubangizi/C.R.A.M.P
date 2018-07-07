@@ -1,6 +1,7 @@
 package com.example.xed.usec;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,13 +11,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class PostRecyclerAdapter extends RecyclerView.Adapter <PostRecyclerAdapter.Viewholder> {
 
     private List<Post> mpostlist;
     private Context context;
+    private DatabaseReference mdatabase;
     Post post = new Post();
 
     PostRecyclerAdapter(List<Post> mpostlist){
@@ -28,13 +38,13 @@ public class PostRecyclerAdapter extends RecyclerView.Adapter <PostRecyclerAdapt
     public Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_post_list_layout,parent,false);
-
         context = parent.getContext();
+        mdatabase = FirebaseDatabase.getInstance().getReference().child("Users");
         return new Viewholder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull Viewholder holder, int position) {
+    public void onBindViewHolder(@NonNull final Viewholder holder, int position) {
 
 
         String titledata =  mpostlist.get(position).getTitle();
@@ -46,6 +56,23 @@ public class PostRecyclerAdapter extends RecyclerView.Adapter <PostRecyclerAdapt
         String image_uri = mpostlist.get(position).getImage();
         holder.setimageview(image_uri);
 
+        final String user_id = mpostlist.get(position).getUser_id();
+
+        mdatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                String username = String.valueOf(dataSnapshot.child(user_id).child("username").getValue());
+                String image = String.valueOf(dataSnapshot.child(user_id).child("profileImage").getValue());
+              holder.setUserdata(username,image);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -60,7 +87,8 @@ public class PostRecyclerAdapter extends RecyclerView.Adapter <PostRecyclerAdapt
         TextView titleView;
         TextView descView;
         ImageView postimageView;
-        TextView userView;
+        TextView usernameView;
+        CircleImageView profileView;
 
         public Viewholder(View itemView) {
             super(itemView);
@@ -83,9 +111,14 @@ public class PostRecyclerAdapter extends RecyclerView.Adapter <PostRecyclerAdapt
             Glide.with(context).load(downloadUri).into(postimageView);
         }
 
-        public void setUserText(String userVal) {
-            userView = mview.findViewById(R.id.postUsername);
-            userView.setText(userVal);
+        public void setUserdata(String name, String profileimage) {
+            usernameView = mview.findViewById(R.id.postUsername);
+            profileView = mview.findViewById(R.id.postuserimage);
+            usernameView.setText(name);
+
+            RequestOptions placeHolderOptions =new RequestOptions();
+            placeHolderOptions.placeholder(R.mipmap.action_account);
+            Glide.with(context).applyDefaultRequestOptions(placeHolderOptions).load(profileimage).into(profileView);
         }
     }
 }

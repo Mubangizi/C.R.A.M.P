@@ -18,7 +18,10 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -47,6 +50,7 @@ public class AccountSetupActivity extends AppCompatActivity {
     private DatabaseReference mdatabase;
     private  String user_id;
     private String username_val;
+    private String TAG = "AccountSetupActivity.java";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +66,29 @@ public class AccountSetupActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
         user_id = firebaseAuth.getCurrentUser().getUid();
-        username_val = msetupuserName.getText().toString();
 
         mdatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
         setupToolbar = findViewById(R.id.setuptoolbar);
         setSupportActionBar(setupToolbar);
         getSupportActionBar().setTitle("Account Setup");
+
+        mdatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                String userval = String.valueOf(dataSnapshot.child(user_id).child("username").getValue());
+                String imageval = String.valueOf(dataSnapshot.child(user_id).child("profileImage").getValue());
+
+                msetupuserName.setText(userval);
+                Glide.with(getApplicationContext()).load(imageval).into(msetupImage);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
         msetupImage.setOnClickListener(new View.OnClickListener() {
@@ -96,38 +116,41 @@ public class AccountSetupActivity extends AppCompatActivity {
             public void onClick(View v) {
                 msetupprogress.setVisibility(View.VISIBLE);
 
+                username_val = msetupuserName.getText().toString().trim();
+
+                Log.e(TAG,"Save button: Username: "+username_val+" Image uri: "+setupimageUrl.toString());
+
                 if (!TextUtils.isEmpty(username_val) && setupimageUrl != null) {
 
                     user_id = FirebaseAuth.getInstance().getUid();
                     final StorageReference imagepath = storageReference.child("Profile_Images").child(user_id+ ".jpg");
-                    imagepath.putFile(setupimageUrl).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+
+                    imagepath.putFile(setupimageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
-                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
+                            taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+                                    Uri downloadurl = task.getResult();
+                                    String profileimage = String.valueOf(downloadurl);
 
-                            if (task.isSuccessful()) {
+                                    Post post = new Post(username_val,profileimage);
+                                    mdatabase.child(user_id).setValue(post);
 
-                                Task<Uri> downloadurl = imagepath.getDownloadUrl();
-                                //Uri downloadurl = imagepath.getDownloadUrl().getResult();
+                                    Toast.makeText(AccountSetupActivity.this, "Settings Updated", Toast.LENGTH_LONG).show();
+                                    Intent homepageIntent = new Intent(AccountSetupActivity.this, MainActivity.class);
+                                    startActivity(homepageIntent);
+                                    finish();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    String error = taskSnapshot.getTask().getException().getMessage();
+                                    Toast.makeText(AccountSetupActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
+                                    msetupprogress.setVisibility(View.INVISIBLE);
+                                }
+                            });
 
-                                Post post = new Post(username_val,downloadurl.toString());
-                                mdatabase.child(user_id).setValue(post);
-
-
-                                /*
-                                DatabaseReference userref = mdatabase.child(user_id);
-                                userref.child("username").setValue(username_val);
-                                userref.child("profileimages").setValue(downloadurl.toString());
-                                */
-
-                                Toast.makeText(AccountSetupActivity.this, "Settings Updated", Toast.LENGTH_LONG).show();
-                                Intent homepageIntent = new Intent(AccountSetupActivity.this, MainActivity.class);
-                                startActivity(homepageIntent);
-                                finish();
-                            } else {
-                                String error = task.getException().getMessage();
-                                Toast.makeText(AccountSetupActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
-                                msetupprogress.setVisibility(View.INVISIBLE);
-                            }
                         }
                     });
                 } else {
@@ -137,6 +160,8 @@ public class AccountSetupActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -149,14 +174,12 @@ public class AccountSetupActivity extends AppCompatActivity {
                 msetupImage.setImageURI(setupimageUrl);
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
+
             }
         }
     }
 
-
-
     public void imagepicker() {
-
         CropImage.activity()
                 .setGuidelines(CropImageView.Guidelines.ON)
                 .setAspectRatio(1,1)

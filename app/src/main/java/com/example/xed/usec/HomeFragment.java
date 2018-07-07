@@ -36,6 +36,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView postlistView;
     private List <Post> mpostlist;
     private DatabaseReference myRef;
+    private DatabaseReference mdatabaseUsers;
     private PostRecyclerAdapter postrecycler;
 
     public HomeFragment() {
@@ -51,6 +52,8 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         myRef = FirebaseDatabase.getInstance().getReference("Posts");
+        mdatabaseUsers = FirebaseDatabase.getInstance().getReference("Users");
+        mdatabaseUsers.keepSynced(true);
         myRef.keepSynced(true);
         mpostlist = new ArrayList<>();
 
@@ -63,33 +66,6 @@ public class HomeFragment extends Fragment {
         //mpostlist.add(new Post("Dummy title","Dummy description","ryty"));
 
         postrecycler = new PostRecyclerAdapter(mpostlist);
-
-
-
-
-        /*
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                for(DataSnapshot dataSnapshot1 :dataSnapshot.getChildren()){
-
-                    Post post = dataSnapshot1.getValue(Post.class);
-                    mpostlist.add(post);
-                    // Toast.makeText(MainActivity.this,""+name,Toast.LENGTH_LONG).show();
-                    postrecycler.notifyDataSetChanged();
-
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                //  Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-        */
 
         return view;
     }
