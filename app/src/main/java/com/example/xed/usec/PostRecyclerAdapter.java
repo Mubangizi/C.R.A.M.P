@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -56,6 +59,9 @@ public class PostRecyclerAdapter extends RecyclerView.Adapter <PostRecyclerAdapt
         String image_uri = mpostlist.get(position).getImage();
         holder.setimageview(image_uri);
 
+        Long timestamp = mpostlist.get(position).getTimestamp();
+        holder.setdateView(timestamp);
+
         final String user_id = mpostlist.get(position).getUser_id();
 
         mdatabase.addValueEventListener(new ValueEventListener() {
@@ -86,6 +92,7 @@ public class PostRecyclerAdapter extends RecyclerView.Adapter <PostRecyclerAdapt
         View mview;
         TextView titleView;
         TextView descView;
+        TextView dateView;
         ImageView postimageView;
         TextView usernameView;
         CircleImageView profileView;
@@ -110,6 +117,15 @@ public class PostRecyclerAdapter extends RecyclerView.Adapter <PostRecyclerAdapt
             postimageView =mview.findViewById(R.id.postimage);
             Glide.with(context).load(downloadUri).into(postimageView);
         }
+
+        public void  setdateView(Long timestamp){
+            Calendar cal = Calendar.getInstance(Locale.getDefault());
+            cal.setTimeInMillis(timestamp);
+            String date = String.valueOf(DateFormat.format("dd/MMM/yyyy hh:mm",cal));
+            dateView = mview.findViewById(R.id.postdate);
+            dateView.setText(date);
+        }
+
 
         public void setUserdata(String name, String profileimage) {
             usernameView = mview.findViewById(R.id.postUsername);

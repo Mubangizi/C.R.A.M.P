@@ -97,6 +97,7 @@ public class PostActivity extends AppCompatActivity {
         final String desc_val = mdescEditText.getText().toString().trim();
         final String entry_id = String.valueOf(System.currentTimeMillis());
         final String user_id =String.valueOf(userid);
+        final Long timestamp = System.currentTimeMillis();
 
         //checking if title, desc and image are not empty
         if(!TextUtils.isEmpty(title_val ) && !TextUtils.isEmpty(desc_val) && mimageUri != null){
@@ -115,7 +116,7 @@ public class PostActivity extends AppCompatActivity {
                            public void onComplete(@NonNull Task<Uri> task) {
                                String downloaduri = String.valueOf(task.getResult());
 
-                               Post post = new Post(entry_id,title_val,desc_val,downloaduri,user_id);
+                               Post post = new Post(entry_id,title_val,desc_val,downloaduri,user_id,timestamp);
                                mdatabase.child(post.getEntry_id()).setValue(post);
 
                                mprogress.dismiss();
