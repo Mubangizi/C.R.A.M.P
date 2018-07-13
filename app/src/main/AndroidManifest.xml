@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -27,7 +29,11 @@
             android:theme="@style/Base.Theme.AppCompat" />
         <activity android:name=".PostListLayout" />
         <activity android:name=".AccountRegistration" />
-        <activity android:name=".SinglePostActivity"></activity>
+        <activity android:name=".SinglePostActivity" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBukRQ-SgshAWYYjuFcaAUxjqA2UohsaDs" />
     </application>
 
 </manifest>
