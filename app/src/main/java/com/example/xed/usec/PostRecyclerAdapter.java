@@ -30,7 +30,6 @@ public class PostRecyclerAdapter extends RecyclerView.Adapter <PostRecyclerAdapt
     private List<Post> mpostlist;
     private Context context;
     private DatabaseReference mdatabase;
-    Post post = new Post();
 
     PostRecyclerAdapter(List<Post> mpostlist){
         this.mpostlist= mpostlist;

@@ -5,11 +5,13 @@ public class Post {
     private String title;
     private String description;
     private String image;
-    private String entry_id;
+    private String post_id;
     private String user_id;
     private String profileImage;
     private String username;
     private Long timestamp;
+    private Double latitude;
+    private Double logitude;
 
     public Post(String username, String profileImage) {
         this.profileImage = profileImage;
@@ -19,11 +21,22 @@ public class Post {
     public Post(){
     }
 
-    public Post(String entry_id, String title, String description, String image, String user_id, Long timestamp) {
+    public Post(String post_id, String title, String description, String image, String user_id, Long timestamp,Double latitude,Double longitude) {
         this.title = title;
         this.description = description;
         this.image = image;
-        this.entry_id = entry_id;
+        this.post_id = post_id;
+        this.user_id = user_id;
+        this.timestamp = timestamp;
+        this.latitude=latitude;
+        this.logitude=longitude;
+    }
+
+    public Post(String post_id, String title, String description, String image, String user_id, Long timestamp) {
+        this.title = title;
+        this.description = description;
+        this.image = image;
+        this.post_id = post_id;
         this.user_id = user_id;
         this.timestamp = timestamp;
     }
@@ -36,12 +49,12 @@ public class Post {
         this.user_id = user_id;
     }
 
-    public String getEntry_id() {
-        return entry_id;
+    public String getPost_id() {
+        return post_id;
     }
 
-    public void setEntry_id(String entry_id) {
-        this.entry_id = entry_id;
+    public void setPost_id(String post_id) {
+        this.post_id = post_id;
     }
 
     public String getImage() {
@@ -91,6 +104,22 @@ public class Post {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLogitude() {
+        return logitude;
+    }
+
+    public void setLogitude(Double logitude) {
+        this.logitude = logitude;
     }
 }
 

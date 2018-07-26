@@ -32,6 +32,7 @@ public class HomeFragment extends Fragment {
     private DatabaseReference myRef;
     private DatabaseReference mdatabaseUsers;
     private PostRecyclerAdapter postrecycler;
+    private LinearLayoutManager linearLayoutManager;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -51,13 +52,13 @@ public class HomeFragment extends Fragment {
         myRef.keepSynced(true);
         mpostlist = new ArrayList<>();
 
+        linearLayoutManager=new LinearLayoutManager(getActivity());
+        linearLayoutManager.setReverseLayout(true);
         postlistView = view.findViewById(R.id.post_list_view);
         postlistView.setHasFixedSize(true);
-
-        postlistView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        postlistView.setLayoutManager(linearLayoutManager);
         postlistView.setItemAnimator(new DefaultItemAnimator());
 
-        //mpostlist.add(new Post("Dummy title","Dummy description","ryty"));
 
         postrecycler = new PostRecyclerAdapter(mpostlist);
 
