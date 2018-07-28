@@ -29,7 +29,8 @@
             android:theme="@style/Base.Theme.AppCompat" />
         <activity android:name=".PostListLayout" />
         <activity android:name=".AccountRegistration" />
-        <activity android:name=".SinglePostActivity" />
+        <activity android:name=".SinglePostActivity"
+            android:parentActivityName=".MainActivity"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

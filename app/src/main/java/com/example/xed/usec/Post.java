@@ -18,7 +18,7 @@ public class Post {
         this.username = username;
     }
 
-    public Post(){
+    public Post(double latitude, double altitude){
     }
 
     public Post(String post_id, String title, String description, String image, String user_id, Long timestamp,Double latitude,Double longitude) {
@@ -40,6 +40,7 @@ public class Post {
         this.user_id = user_id;
         this.timestamp = timestamp;
     }
+
 
     public String getUser_id() {
         return user_id;

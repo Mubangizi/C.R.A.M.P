@@ -1,5 +1,6 @@
 package com.example.xed.usec;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -8,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -50,6 +52,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     DatabaseReference mdatabase;
     Post post;
     Marker marker;
+    int PERMISION_CODE = 1;
 
     public MapFragment() {
         // Required empty public constructor
@@ -69,7 +72,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mapView = (MapView) mview.findViewById(R.id.map_view);
+        mapView = mview.findViewById(R.id.map_view);
+
+
         mdatabase = FirebaseDatabase.getInstance().getReference("Posts");
 
         if (mapView != null) {
@@ -85,8 +90,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mgoogleMap = googleMap;
+        defaultloc();
         googleMap.setOnMarkerClickListener(this);
-        //googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+
         mdatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -100,11 +106,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                             .title(post.getTitle())
                             .snippet(post.getDesc())
                     );
-                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
+                    /*
                     mgoogleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
                     CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(location).build();
                     mgoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    */
 
                 }
 
@@ -115,6 +123,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
             }
         });
+    }
+
+
+    private void defaultloc(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(getContext(),
+                    android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions((Activity) getContext(), new String[]
+                        {android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_CODE);
+            }
+        }
+        else{
+            // showing user location
+            mgoogleMap.setMyLocationEnabled(true);
+        }
     }
 
     @Override

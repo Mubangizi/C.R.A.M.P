@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -48,6 +49,7 @@ public class PostRecyclerAdapter extends RecyclerView.Adapter <PostRecyclerAdapt
     @Override
     public void onBindViewHolder(@NonNull final Viewholder holder, int position) {
 
+        final String post_key = mpostlist.get(position).getPost_id();
 
         String titledata =  mpostlist.get(position).getTitle();
         holder.setTitleText(titledata);
@@ -76,6 +78,19 @@ public class PostRecyclerAdapter extends RecyclerView.Adapter <PostRecyclerAdapt
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
+
+        //GETING KEY FOR THE POST
+
+
+        holder.mview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent singlepostIntent = new Intent(context, SinglePostActivity.class);
+                singlepostIntent.putExtra("post_id", post_key);
+                context.startActivity(singlepostIntent);
             }
         });
 

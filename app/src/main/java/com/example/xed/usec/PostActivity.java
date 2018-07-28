@@ -1,6 +1,7 @@
 package com.example.xed.usec;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,6 +13,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -21,6 +23,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -55,6 +62,7 @@ public class PostActivity extends AppCompatActivity {
     private String userid;
     private Double latitude_val;
     private Double longitude_val;
+    private int REQUEST_CODE=10;
 
     //location
     private LocationManager locationManager;
@@ -80,6 +88,9 @@ public class PostActivity extends AppCompatActivity {
         //getting location
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
+
+
+        /*
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -104,6 +115,7 @@ public class PostActivity extends AppCompatActivity {
                 startActivity(i);
             }
         };
+        */
 
         /*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -146,23 +158,72 @@ public class PostActivity extends AppCompatActivity {
         msubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    Toast.makeText(getApplicationContext(), "Please enable location services", Toast.LENGTH_SHORT).show();
+                }
+
+                int permission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+                if (permission == PackageManager.PERMISSION_GRANTED) {
+                    LocationRequest locationRequest= new LocationRequest();
+
+                    //Specify how app should request the device’s location//
+                    locationRequest.setInterval(10000);
+                    locationRequest.setFastestInterval(5000);
+
+                    //Get the most accurate location data available//
+                    locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                    FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(getApplicationContext());
+
+                    //...then request location updates//
+                    client.requestLocationUpdates(locationRequest, new LocationCallback() {
+                        @Override
+                        public void onLocationResult(LocationResult locationResult) {
+
+                            //Get a reference to the database, to perform read and write operations//
+                            Location location = locationResult.getLastLocation();
+                            latitude_val=location.getLatitude();
+                            longitude_val=location.getLongitude();
+                            //FirebaseDatabase.getInstance().getReference().child("accidentLocation").setValue(locationModel);
+
+                        }
+                    }, null);
+
+                } else {
+                    ActivityCompat.requestPermissions((Activity) getApplicationContext(),
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            REQUEST_CODE);
+                }
+
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        requestPermissions(new String[]{
+                                Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.INTERNET}
+                                , REQUEST_CODE);
+                    }
                     // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                //PARAMETERS ARE THE SERVICE, MIN TIME IN MILLI SEC, MIN DISTANCE, AND LISTENER
-                locationManager.requestLocationUpdates("gps", 0, 0, (android.location.LocationListener) locationListener);
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            //PARAMETERS ARE THE SERVICE, MIN TIME IN MILLI SEC, MIN DISTANCE, AND LISTENER
+            //locationManager.requestLocationUpdates("gps", 0, 0, (android.location.LocationListener) locationListener);
 
-                startPosting();
+            startPosting();
             }
         });
+    }
+
+    private void getloc(Double latitude_val, Double longitude_val) {
+        this.latitude_val = latitude_val;
+        this.longitude_val = longitude_val;
     }
 
     //method for posting
@@ -174,7 +235,6 @@ public class PostActivity extends AppCompatActivity {
         final String post_id = String.valueOf(System.currentTimeMillis());
         final String user_id = String.valueOf(userid);
         final Long timestamp = System.currentTimeMillis();
-
         //checking if title, desc and image are not empty
         if(!TextUtils.isEmpty(title_val ) && !TextUtils.isEmpty(desc_val) && mimageUri != null){
 
@@ -244,7 +304,7 @@ public class PostActivity extends AppCompatActivity {
         }
     }
 
-    /*
+
     //CHECKING IF LOCATION PERMISSIONS WERE GRANTED
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -252,16 +312,17 @@ public class PostActivity extends AppCompatActivity {
         switch (requestCode){
             case 10:
                 if(grantResults.length>0 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
-                    submitPostButton();
+                    //submitPostButton();
                 }
             return;
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-     */
     public void toastMessage(String message){
         Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
     }
+
+
 }
 
