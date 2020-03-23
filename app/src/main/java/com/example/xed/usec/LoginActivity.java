@@ -37,33 +37,42 @@ public class LoginActivity extends AppCompatActivity {
         mpasswordText= (EditText) findViewById(R.id.loginpassword);
         mloginBtn = (Button) findViewById(R.id.loginbtn);
         mregbtn = (Button) findViewById(R.id.loginregbtn);
-        mloginProgress = (ProgressBar) findViewById(R.id.loginprogress);
+        mloginProgress = findViewById(R.id.loginprogress);
 
         mloginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                String email_Val = memailText.getText().toString();
-                String pass_Val =mpasswordText.getText().toString();
+            String email_Val = memailText.getText().toString();
+            String pass_Val =mpasswordText.getText().toString();
 
-                if(!TextUtils.isEmpty(email_Val ) && !TextUtils.isEmpty(pass_Val)){         //checking if elements are empty
-                    mloginProgress.setVisibility(View.VISIBLE);
+            if(!TextUtils.isEmpty(email_Val ) && !TextUtils.isEmpty(pass_Val)){         //checking if elements are empty
+                mloginProgress.setVisibility(View.VISIBLE);
 
-                    mAuth.signInWithEmailAndPassword(email_Val,pass_Val).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(task.isSuccessful()){
-                                sendToMain();
-                            }else {
-                                String errormessage = task.getException().getMessage();
-                                toastmessage(errormessage);
-                            }
-                        }
-                    });
+                mAuth.signInWithEmailAndPassword(email_Val,pass_Val).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                    if(task.isSuccessful()){
+                        sendtomain();
+                    }else {
+                        String errormessage = task.getException().getMessage();
+                        toastmessage(errormessage);
+                    }
+                    }
+                });
 
-                    mloginProgress.setVisibility(View.INVISIBLE);
-                }
+                mloginProgress.setVisibility(View.INVISIBLE);
+            }
 
+            }
+        });
+
+        mregbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent regIntent = new Intent(LoginActivity.this, AccountRegistration.class);
+                startActivity(regIntent);
+                finish();
             }
         });
     }
@@ -75,16 +84,12 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         if(currentUser != null){
-            sendToMain();
+            sendtomain();
         }
 
     }
 
-
-
-
-    //sending to main
-    public void sendToMain(){
+    public void sendtomain(){
         Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(mainIntent);
         finish();

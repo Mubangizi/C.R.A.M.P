@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -19,9 +21,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".PostActivity" />
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".AccountSetupActivity" />
         <activity
-            android:name=".PostActivity" />
-        <activity android:name=".LoginActivity"></activity>
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
+        <activity android:name=".PostListLayout" />
+        <activity android:name=".AccountRegistration" />
+        <activity android:name=".SinglePostActivity"
+            android:parentActivityName=".MainActivity"/>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBukRQ-SgshAWYYjuFcaAUxjqA2UohsaDs"/>
     </application>
 
 </manifest>
